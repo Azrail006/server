@@ -25,10 +25,13 @@ class ProductsController {
 
     }
     async deleteProduct(req, res) {
-     const id = req.params.id
-     const product = await db.query('DELETE FROM products where id = $1', [id])
-     res.json(product.rows[0])
+        const id = req.params.id
+        const product = await db.query('DELETE FROM products where id = $1', [id])
+        res.json(product.rows[0])
     }
+
+
+
 }
 
 module.exports = new ProductsController()
