@@ -1,49 +1,35 @@
-const morgan = require("morgan");
+// const morgan = require("morgan");
 const express  = require("express")
-const multer = require('multer');
+const multer  = require("multer");
 const productsRouter = require('./routes/products.routes')
 const app = express(); 
-const fs = require('fs');
-
 const PORT = 3000;
 
-
-const storage = multer.diskStorage({
-    destination: function(req, file, callback) {
-      callback(null, './image');
-    },
-    filename: function (req, file, callback) {
-      callback(null, file.fieldname);
-    }
-  });
-  app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(morgan('dev'));
-
-app.use(express.static(__dirname, 'public'));
-
-var upload = multer({ dest: 'upload/'});
-var type = upload.single('file');
-
-app.post('/upload', type, function (req,res) {
-  var tmp_path = req.files.recfile.path;
-  var target_path = 'uploads/' + req.files.recfile.name;
-fs.readFile(tmp_path, function(err, data)
-
-{
-  fs.writeFile(target_path, data, function (err)
-  {
-    res.render('complete');
-  })
-
-});
-});
-
   
+const storageConfig = multer.diskStorage({
+    destination: (req, file, cb) =>{
+        cb(null, "uploads");
+    },
+    filename: (req, file, cb) =>{
+        cb(null, file.originalname);
+    }
+});
+
+ 
+app.use(multer({storage:storageConfig}).single("filedata"));
+app.post("/upload", function (req, res, next) {
+   
+    let filedata = req.file;
+    if(!filedata)
+        res.send("Ошибка при загрузке файла");
+    else
+        res.send("Файл загружен");
+});
+
+
+
 app.use(express.json());
 app.use('/api', productsRouter)
- 
-
 app.listen(PORT, () => console.log(`server runing ${PORT}`))
 
 
